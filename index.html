@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Between the Narrow Places</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #E5E3DC;
+    --paper-card: #FAF9F6;
+    --ink: #303636;
+    --ink-soft: #5C6363;
+    --blue: #4A90D9;
+    --blue-bg: #DCEAF7;
+    --tan: #D3A16C;
+    --tan-bg: #F3E4D2;
+    --rust: #B0604A;
+    --rust-bg: #F0DDD6;
+    --rule: #D3D0C6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'PT Serif', serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 90px; }
+
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 26px; margin-bottom: 26px; }
+
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--blue); font-weight: 600; margin-bottom: 10px;
+  }
+
+  h1 { font-family: 'Marcellus', serif; font-weight: 500; font-size: 36px; margin: 0 0 6px; line-height: 1.15; }
+
+  .subtitle { font-family: 'Marcellus', serif; font-style: italic; font-size: 16px; color: var(--ink-soft); margin: 0 0 14px; }
+
+  .sub { color: var(--ink-soft); font-size: 14.5px; max-width: 620px; line-height: 1.65; margin: 0 0 6px; }
+
+  .view-toggle { display: flex; gap: 6px; margin-top: 20px; }
+
+  .view-btn {
+    font-family: 'Marcellus', serif; font-size: 14px; padding: 8px 18px; border-radius: 6px;
+    border: 1px solid var(--rule); background: var(--paper-card); color: var(--ink-soft); cursor: pointer;
+  }
+
+  .view-btn.active { background: var(--ink); color: var(--paper-card); border-color: var(--ink); }
+
+  /* Overview */
+  .arc-strip { display: flex; gap: 8px; margin: 22px 0; flex-wrap: wrap; }
+
+  .arc-phase {
+    flex: 1; min-width: 150px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--rule);
+  }
+
+  .arc-phase.descent { background: var(--blue-bg); border-color: var(--blue); }
+  .arc-phase.rupture { background: var(--rust-bg); border-color: var(--rust); }
+  .arc-phase.comfort { background: var(--tan-bg); border-color: var(--tan); }
+
+  .arc-phase h3 { font-family: 'Marcellus', serif; font-size: 15px; margin: 0 0 4px; }
+  .arc-phase.descent h3 { color: var(--blue); }
+  .arc-phase.rupture h3 { color: var(--rust); }
+  .arc-phase.comfort h3 { color: var(--tan); }
+  .arc-phase p { font-size: 12.5px; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+
+  .block-title { font-family: 'Marcellus', serif; font-size: 20px; margin: 32px 0 12px; }
+
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 8px; }
+  .schedule-table th { text-align: left; font-family: 'Marcellus', serif; font-weight: 500; font-size: 13px; color: var(--ink-soft); padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+  .schedule-table td { padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+  .schedule-note { font-size: 12.5px; color: var(--ink-soft); font-style: italic; margin: 8px 0 0; }
+
+  .reading-tier { margin-bottom: 18px; }
+  .reading-tier h4 { font-family: 'Marcellus', serif; font-size: 15px; margin: 0 0 8px; color: var(--ink); }
+  .reading-tier ul { margin: 0; padding-left: 20px; }
+  .reading-tier li { font-size: 13.5px; line-height: 1.6; color: var(--ink); margin-bottom: 6px; }
+  .reading-tier li strong { font-weight: 600; }
+
+  .overview-copy { font-size: 14.5px; line-height: 1.7; color: var(--ink); margin-bottom: 4px; }
+
+  /* Sessions */
+  .progress-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .progress-track { flex: 1; height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--blue); border-radius: 3px; transition: width 0.2s ease; }
+  .progress-label { font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+
+  .session-card {
+    background: var(--paper-card); border: 1px solid var(--rule); border-radius: 10px;
+    margin-bottom: 14px; overflow: hidden;
+  }
+
+  .session-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 18px; cursor: pointer;
+  }
+
+  .session-head-left { display: flex; align-items: center; gap: 12px; }
+
+  .session-check {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--rule);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--paper-card); cursor: pointer;
+  }
+
+  .session-check.done { background: var(--blue); border-color: var(--blue); }
+
+  .session-title { font-family: 'Marcellus', serif; font-size: 16px; margin: 0; }
+  .session-sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+
+  .phase-tag {
+    font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+
+  .phase-tag.descent { background: var(--blue-bg); color: var(--blue); }
+  .phase-tag.rupture { background: var(--rust-bg); color: var(--rust); }
+  .phase-tag.comfort { background: var(--tan-bg); color: var(--tan); }
+
+  .chevron { transition: transform 0.15s ease; color: var(--ink-soft); flex-shrink: 0; }
+  .chevron.open { transform: rotate(90deg); }
+
+  .session-body { padding: 0 18px 20px; display: none; }
+  .session-body.open { display: block; }
+
+  .session-field { margin-bottom: 14px; }
+  .session-field-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--blue); margin-bottom: 5px;
+  }
+  .session-field-text { font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .session-field-text.italic { font-style: italic; color: var(--ink-soft); }
+
+  .journal-box textarea {
+    width: 100%; min-height: 110px; padding: 12px 14px; border: 1px solid var(--rule);
+    border-radius: 8px; background: var(--paper); font-family: 'PT Serif', serif; font-size: 13.5px;
+    color: var(--ink); line-height: 1.6; resize: vertical;
+  }
+
+  .journal-box textarea:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+  .save-status { font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; height: 14px; }
+
+  .tools-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+
+  .tool-btn {
+    font-family: 'Marcellus', serif; font-size: 13.5px; padding: 8px 16px; border-radius: 6px;
+    border: 1px solid var(--rule); background: var(--paper-card); color: var(--ink-soft); cursor: pointer;
+  }
+
+  .tool-btn:hover { border-color: var(--blue); color: var(--ink); }
+
+  .storage-note {
+    font-size: 12px; color: var(--ink-soft); background: var(--paper-card); border: 1px solid var(--rule);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; line-height: 1.5;
+  }
+
+  footer {
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font-size: 12px; color: var(--ink-soft); text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 28px; }
+    .wrap { padding: 32px 16px 70px; }
+    .arc-strip { flex-direction: column; }
+  }
+
+  /* --- Shared footer CTA block --- */
+  .cta-block {
+    margin-top: 48px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .cta-panel {
+    padding: 32px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .cta-panel:last-of-type { border-bottom: none; }
+
+  .cta-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 26px;
+    color: var(--ink);
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+
+  .cta-text {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 620px;
+    margin: 0 0 12px;
+  }
+
+  .cta-btn-gold {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: #FFFDF8;
+    background: #C9A368;
+    text-decoration: none;
+    padding: 14px 34px;
+    border-radius: 999px;
+    margin-top: 6px;
+    transition: background 0.15s ease;
+  }
+
+  .cta-btn-gold:hover { background: #B8935A; }
+
+  .cta-substack-embed { margin-top: 10px; max-width: 100%; overflow: hidden; }
+  .cta-substack-embed iframe { max-width: 100%; }
+
+  @media (max-width: 480px) {
+    .cta-heading { font-size: 22px; }
+  }
+
+
+  footer a { color: var(--gold); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+
+  .cta-book-panel {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .cta-photo {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .cta-book-content { flex: 1; min-width: 240px; }
+
+  @media (max-width: 560px) {
+    .cta-book-panel { flex-direction: column; align-items: flex-start; }
+    .cta-photo { width: 100%; height: auto; max-width: 280px; }
+  }
+
+
+  .cta-bio-panel { align-items: flex-start; }
+
+  .cta-link {
+    color: var(--gold);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+  }
+
+  .cta-link:hover { color: #B8935A; border-color: #B8935A; }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Course companion &amp; journal</div>
+    <h1>Between the Narrow Places</h1>
+    <p class="subtitle">Grief, rupture, and the work of repair &mdash; a study of Eikhah</p>
+    <p class="sub">This is a study of Eikhah &mdash; Lamentations &mdash; built on the Jewish calendar's own architecture for collective mourning. The arc follows Bein HaMetzarim, the Three Weeks between the seventeenth of Tammuz and the ninth of Av: three weeks of descent, a single concentrated day of rupture at Tisha B'Av, and seven weeks of comfort that follow.</p>
+    <p class="sub">The course draws a direct line from ancient catastrophe to the grief many of us are carrying now &mdash; including, unavoidably, the devastation in Gaza and the long reckoning many Jews are doing with political Zionism &mdash; without collapsing any of it into the other, and without rushing toward hope the text hasn't earned yet.</p>
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="overview">Overview</button>
+      <button class="view-btn" data-view="sessions">Sessions &amp; Journal</button>
+    </div>
+  </header>
+
+  <div id="overviewView">
+    <div class="arc-strip">
+      <div class="arc-phase descent">
+        <h3>Descent</h3>
+        <p>Three Weeks &mdash; Eikha, Sinat Chinam, the Nine Days</p>
+      </div>
+      <div class="arc-phase rupture">
+        <h3>Rupture</h3>
+        <p>Tisha B'Av &mdash; the full reading, sitting low</p>
+      </div>
+      <div class="arc-phase comfort">
+        <h3>Comfort</h3>
+        <p>Seven Weeks &mdash; the haftarot of consolation, Nachamu through Sos Asis</p>
+      </div>
+    </div>
+
+    <h2 class="block-title">How the live sessions map to the calendar</h2>
+    <table class="schedule-table">
+      <tr><th>Session</th><th>Falls within</th><th>Covers</th></tr>
+      <tr><td>Parts 1 &amp; 2</td><td>Early in the Three Weeks, shortly after 17 Tammuz</td><td>Week 1 &mdash; Eikha</td></tr>
+      <tr><td>Parts 3 &amp; 4</td><td>Mid&#8209;Three Weeks</td><td>Week 2 &mdash; Sinat Chinam</td></tr>
+      <tr><td>Part 5</td><td>During the Nine Days (Rosh Chodesh Av onward)</td><td>Week 3 &mdash; The Nine Days</td></tr>
+      <tr><td>Full Reading</td><td>Tisha B'Av itself</td><td>The complete text, ideally sunset to sunset</td></tr>
+    </table>
+    <p class="schedule-note">This guide runs on the Hebrew calendar, so the Gregorian dates shift every year. Check <a href="https://www.hebcal.com/holidays/tisha-bav" target="_blank" rel="noopener">this year's Tisha B'Av date</a> and count backward to set the live sessions. The Seven Weeks of Comfort that follow (Weeks 4&ndash;10) are self-guided using this companion.</p>
+
+    <h2 class="block-title">Primary texts</h2>
+    <div class="reading-tier">
+      <ul>
+        <li><strong><a href="https://www.sefaria.org/Lamentations" target="_blank" rel="noopener">Megillat Eikha</a></strong> (Lamentations), in Ketuvim</li>
+        <li><strong><a href="https://www.sefaria.org/Eikhah_Rabbah" target="_blank" rel="noopener">Eikha Rabbah</a></strong> &mdash; the classical Talmudic-era midrash on Lamentations, compiled in Israel</li>
+        <li><strong><a href="https://www.sefaria.org/Mishnah_Ta'anit.4" target="_blank" rel="noopener">Mishnah Ta'anit</a></strong>, chapter 4 &mdash; the five calamities and the fast's halakhic structure</li>
+        <li><strong>Talmud Bavli</strong>: <a href="https://www.sefaria.org/Gittin.55b-58a" target="_blank" rel="noopener">Gittin 55b&ndash;58a</a> and <a href="https://www.sefaria.org/Yoma.9b" target="_blank" rel="noopener">Yoma 9b</a> &mdash; the destruction narratives</li>
+        <li>The seven haftarot of consolation: <a href="https://www.sefaria.org/Isaiah.40" target="_blank" rel="noopener">Isaiah 40</a>, <a href="https://www.sefaria.org/Isaiah.49" target="_blank" rel="noopener">49</a>, <a href="https://www.sefaria.org/Isaiah.51" target="_blank" rel="noopener">51</a>, <a href="https://www.sefaria.org/Isaiah.54" target="_blank" rel="noopener">54</a> (twice), <a href="https://www.sefaria.org/Isaiah.60" target="_blank" rel="noopener">60</a>, <a href="https://www.sefaria.org/Isaiah.61" target="_blank" rel="noopener">61</a></li>
+      </ul>
+    </div>
+
+    <h2 class="block-title">In conversation with</h2>
+    <div class="reading-tier">
+      <ul>
+        <li>Martin Prechtel and Francis Weller, on grief as initiation &mdash; held as resonance, not foundation</li>
+        <li>Christina Sharpe, <em>In the Wake</em> &mdash; on catastrophe as ongoing rather than a discrete past event</li>
+        <li>Robin Wall Kimmerer, Mahmoud Darwish, Aurora Levins Morales &mdash; on memory, erasure, and repair</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="sessionsView" style="display:none;">
+    <div class="storage-note">Your reflections save automatically in this browser as you type. They're private to you and won't sync across devices &mdash; use "Export journal" below to keep a copy.</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">0 of 11 sessions marked complete</div>
+    </div>
+    <div id="sessionList"></div>
+    <div class="tools-row">
+      <button class="tool-btn" id="exportBtn">Export journal as text</button>
+      <button class="tool-btn" id="resetBtn">Clear all my entries</button>
+    </div>
+  </div>
+
+  
+  <div class="cta-block">
+    <div class="cta-panel">
+      <h2 class="cta-heading">Use this. Make it yours.</h2>
+      <p class="cta-text">Please use them. Adapt them, bring them into your own communities, make them yours. That's what they're for.</p>
+      <p class="cta-text">And if something here was useful to you &mdash; I'd love to hear about it. Tell me what you tried, what it opened up, what you'd change. If you share it further, attribute it back to me. And if you're able, pay what you can. These take real time and real care to make, and your support is what lets me keep making them.</p>
+      <a class="cta-btn-gold" href="https://venmo.com/u/AtlasRams" target="_blank" rel="noopener">Give what you can</a>
+    </div>
+
+    <div class="cta-panel cta-bio-panel">
+      <img class="cta-photo" src="avigayil.jpg" alt="Alison Avigayil Ramer" loading="lazy">
+      <div class="cta-book-content">
+        <h2 class="cta-heading">About Alison</h2>
+        <p class="cta-text">Alison Avigayil Ramer is an activist, artist, and interfaith leader with over twenty years of experience spanning community organizing, human rights policy, and spiritual practice. She spent more than fifteen years in Israel and Palestine supporting community-led resistance and advancing human rights policy with the UN, EU, US government, and global technology platforms. Today she works as a coach and consultant to changemakers, spiritual leaders, and organizations navigating grief, burnout, and transformation. In response to the grief following October 7, 2023, she also founded the Social Change Sanctuary, an interspiritual space for building resilient, regenerative spiritual life. She is currently a rabbinical student in the lineages of Rabbi Lynn Gottlieb and Shomeret Shalom, the Torah of Non-Violence, indigenous tradition, and interfaith practice.</p>
+        <p class="cta-text"><a class="cta-link" href="https://calendly.com/socialchangestudios/exploratory-call-1" target="_blank" rel="noopener">Book a coaching or consulting session</a> with Alison, or subscribe to her newsletter, <a class="cta-link" href="https://alisonavigayil.substack.com" target="_blank" rel="noopener">Hodaya</a>, for ongoing reflection and practice.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>A living companion for Between the Narrow Places. Texts and prompts are drawn from the course guide.<br><a href="https://www.alisonramer.com" target="_blank" rel="noopener">alisonramer.com</a></footer>
+</div>
+
+<script>
+const sessions = [
+  {
+    id: "week1",
+    title: "Week 1 \u2014 Eikha: How",
+    phase: "descent",
+    liveDate: "Parts 1 & 2 \u2014 early in the Three Weeks",
+    text: "<a href='https://www.sefaria.org/Lamentations.1' target='_blank' rel='noopener'>Lamentations ch. 1</a>; <a href='https://www.sefaria.org/Genesis.3.9' target='_blank' rel='noopener'>Genesis 3:9</a> (Ayeka); <a href='https://www.sefaria.org/Eikhah_Rabbah' target='_blank' rel='noopener'>Eikha Rabbah</a>, proem 24 (the wordplay)",
+    inquiry: "What is the difference between a question that seeks an answer and a question that holds a wound?",
+    prompt: "Write the word \u201chow\u201d at the top of the page. Do not answer it. Write everything underneath it that refuses to resolve into an answer."
+  },
+  {
+    id: "week2",
+    title: "Week 2 \u2014 Sinat Chinam: the rot before the fall",
+    phase: "descent",
+    liveDate: "Parts 3 & 4 \u2014 mid-Three Weeks",
+    text: "<a href='https://www.sefaria.org/Gittin.55b-58a' target='_blank' rel='noopener'>Gittin 55b\u201358a</a> (Kamtza/Bar Kamtza); <a href='https://www.sefaria.org/Yoma.9b' target='_blank' rel='noopener'>Yoma 9b</a> (comparison of the two Temples' causes)",
+    inquiry: "Where does collective catastrophe begin at the size of a single uninvited guest, a single refusal to make amends?",
+    prompt: "Name one small refusal \u2014 yours, or one you witnessed \u2014 that you can now see was never small."
+  },
+  {
+    id: "week3",
+    title: "Week 3 \u2014 The Nine Days: no weddings, no music",
+    phase: "descent",
+    liveDate: "Part 5 \u2014 during the Nine Days",
+    text: "<a href='https://www.sefaria.org/Mishnah_Ta%27anit.4.6-8' target='_blank' rel='noopener'>Mishnah Ta'anit 4:6\u20138</a> (the catalog of the five calamities); Lurianic teaching on shevirat ha-kelim",
+    inquiry: "What does it cost a community to formally restrict its own joy? What does that restriction protect?",
+    prompt: "List what you are withholding from yourself right now, on purpose, because joy would be premature. Don't justify the list. Just make it."
+  },
+  {
+    id: "tishabav",
+    title: "Tisha B'Av \u2014 the concentrated rupture",
+    phase: "rupture",
+    liveDate: "Full Reading \u2014 Tisha B'Av itself",
+    text: "Full reading of <a href='https://www.sefaria.org/Lamentations' target='_blank' rel='noopener'>Lamentations</a>, sitting low, by low light; contemporary testimony",
+    inquiry: "",
+    prompt: "Write from inside the ruin, not about it. First person. Present tense. No metaphor that explains \u2014 only image."
+  },
+  {
+    id: "week4",
+    title: "Week 4 \u2014 Nachamu (Isaiah 40): the doubled comfort",
+    phase: "comfort",
+    liveDate: "Self-guided",
+    text: "<a href='https://www.sefaria.org/Isaiah.40.1-2' target='_blank' rel='noopener'>Isaiah 40:1\u20132</a>",
+    inquiry: "Why does comfort have to be said twice? What does the doubling admit?",
+    prompt: "Comfort yourself once in writing. Now do it again, differently, as if the first time wasn't enough \u2014 because it wasn't."
+  },
+  {
+    id: "week5",
+    title: "Week 5 \u2014 VaTomer Tziyon (Isaiah 49): \u201cGod has forsaken me\u201d",
+    phase: "comfort",
+    liveDate: "Self-guided",
+    text: "<a href='https://www.sefaria.org/Isaiah.49.14' target='_blank' rel='noopener'>Isaiah 49:14</a> and following",
+    inquiry: "This haftarah lets the wounded party speak first and accuse before it's comforted. What does your tradition (or your activist community) forbid you from accusing aloud?",
+    prompt: "Write the accusation you've been told is unfair to make. Make it anyway. Don't soften the ending."
+  },
+  {
+    id: "week6",
+    title: "Week 6 \u2014 Aniyah So'arah (Isaiah 54): the storm-tossed one",
+    phase: "comfort",
+    liveDate: "Self-guided",
+    text: "<a href='https://www.sefaria.org/Isaiah.54.11' target='_blank' rel='noopener'>Isaiah 54:11</a> and following",
+    inquiry: "Comfort addressed directly to the one still in the storm, not after it. What would it mean to be comforted during, not after?",
+    prompt: "Address yourself in second person, mid-storm. Don't promise it ends."
+  },
+  {
+    id: "week7",
+    title: "Week 7 \u2014 Anochi Anochi (Isaiah 51): divine self-naming",
+    phase: "comfort",
+    liveDate: "Self-guided",
+    text: "<a href='https://www.sefaria.org/Isaiah.51.12' target='_blank' rel='noopener'>Isaiah 51:12</a> and following",
+    inquiry: "What does it mean that comfort here requires the comforter to name themselves twice, as if identity itself is the consolation? Where does your own authority to comfort others come from \u2014 and does it need stating twice?",
+    prompt: "Write \u201cI am the one who\u2014\u201d five times, completing it differently each time."
+  },
+  {
+    id: "week8",
+    title: "Week 8 \u2014 Rani Akarah (Isaiah 54): the barren one sings",
+    phase: "comfort",
+    liveDate: "Self-guided",
+    text: "<a href='https://www.sefaria.org/Isaiah.54.1' target='_blank' rel='noopener'>Isaiah 54:1</a> and following",
+    inquiry: "The most violent reversal in the cycle \u2014 barrenness becomes the site of song. What in your life or your community's life has been treated as barren, finished, with nothing left to grow \u2014 and what would it mean to sing from exactly there, not after it changes?",
+    prompt: "Write a song (not a poem \u2014 a song, something that could be sung) from the place you've been told is empty."
+  },
+  {
+    id: "week9",
+    title: "Week 9 \u2014 Kumi Ori (Isaiah 60): arise, shine",
+    phase: "comfort",
+    liveDate: "Self-guided",
+    text: "<a href='https://www.sefaria.org/Isaiah.60.1' target='_blank' rel='noopener'>Isaiah 60:1</a> and following",
+    inquiry: "Light returning is also a question of who gets illuminated and who stays in shadow \u2014 whose grief gets a national holiday and whose doesn't.",
+    prompt: "Name a grief in your own community that has no liturgy, no fast day, no haftarah. Write the missing liturgy's first line."
+  },
+  {
+    id: "week10",
+    title: "Week 10 \u2014 Sos Asis (Isaiah 61): joy as covenant, not bypass",
+    phase: "comfort",
+    liveDate: "Self-guided \u2014 closing session",
+    text: "<a href='https://www.sefaria.org/Isaiah.61.10' target='_blank' rel='noopener'>Isaiah 61:10</a> and following",
+    inquiry: "The cycle ends in marriage imagery \u2014 comfort completed not as a return to how things were, but as a new bond. Repair vs. return, finally answered by the text itself: not restoration, betrothal.",
+    prompt: "What are you now betrothed to, having witnessed this \u2014 not who you were before, but what you're bound to now?"
+  }
+];
+
+const phaseLabels = { descent: "Descent", rupture: "Rupture", comfort: "Comfort" };
+
+// --- storage helpers (localStorage with graceful in-memory fallback) ---
+const memoryStore = {};
+let storageWorks = true;
+try {
+  localStorage.setItem("__test__", "1");
+  localStorage.removeItem("__test__");
+} catch (e) {
+  storageWorks = false;
+}
+
+function loadEntry(id) {
+  if (storageWorks) {
+    try {
+      const raw = localStorage.getItem("narrow-places:" + id);
+      return raw ? JSON.parse(raw) : { text: "", done: false };
+    } catch (e) { /* fall through */ }
+  }
+  return memoryStore[id] || { text: "", done: false };
+}
+
+function saveEntry(id, data) {
+  if (storageWorks) {
+    try {
+      localStorage.setItem("narrow-places:" + id, JSON.stringify(data));
+      return;
+    } catch (e) { /* fall through */ }
+  }
+  memoryStore[id] = data;
+}
+
+let openId = null;
+
+function renderSessions() {
+  const list = document.getElementById("sessionList");
+  list.innerHTML = sessions.map(s => {
+    const entry = loadEntry(s.id);
+    const isOpen = openId === s.id;
+    return `
+      <div class="session-card">
+        <div class="session-head" data-id="${s.id}">
+          <div class="session-head-left">
+            <div class="session-check ${entry.done ? 'done' : ''}" data-check="${s.id}">${entry.done ? '&#10003;' : ''}</div>
+            <div>
+              <p class="session-title">${s.title}</p>
+              <p class="session-sub">${s.liveDate}</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="phase-tag ${s.phase}">${phaseLabels[s.phase]}</span>
+            <span class="chevron ${isOpen ? 'open' : ''}">&#9656;</span>
+          </div>
+        </div>
+        <div class="session-body ${isOpen ? 'open' : ''}">
+          <div class="session-field">
+            <div class="session-field-label">Text</div>
+            <div class="session-field-text italic">${s.text}</div>
+          </div>
+          ${s.inquiry ? `
+          <div class="session-field">
+            <div class="session-field-label">Inquiry</div>
+            <div class="session-field-text">${s.inquiry}</div>
+          </div>` : ""}
+          <div class="session-field">
+            <div class="session-field-label">Prompt</div>
+            <div class="session-field-text">${s.prompt}</div>
+          </div>
+          <div class="session-field journal-box">
+            <div class="session-field-label">Your reflection</div>
+            <textarea data-journal="${s.id}" placeholder="Write here&hellip;">${entry.text}</textarea>
+            <div class="save-status" data-status="${s.id}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = sessions.filter(s => loadEntry(s.id).done).length;
+  document.getElementById("progressFill").style.width = (done / sessions.length * 100) + "%";
+  document.getElementById("progressLabel").textContent = done + " of " + sessions.length + " sessions marked complete";
+}
+
+document.getElementById("sessionList").addEventListener("click", (e) => {
+  const checkBtn = e.target.closest("[data-check]");
+  if (checkBtn) {
+    const id = checkBtn.dataset.check;
+    const entry = loadEntry(id);
+    entry.done = !entry.done;
+    saveEntry(id, entry);
+    renderSessions();
+    return;
+  }
+  const head = e.target.closest(".session-head");
+  if (head) {
+    const id = head.dataset.id;
+    openId = openId === id ? null : id;
+    renderSessions();
+  }
+});
+
+document.getElementById("sessionList").addEventListener("input", (e) => {
+  const ta = e.target.closest("[data-journal]");
+  if (!ta) return;
+  const id = ta.dataset.journal;
+  const entry = loadEntry(id);
+  entry.text = ta.value;
+  saveEntry(id, entry);
+  const status = document.querySelector(`[data-status="${id}"]`);
+  if (status) {
+    status.textContent = "Saved";
+    clearTimeout(status._t);
+    status._t = setTimeout(() => { status.textContent = ""; }, 1500);
+  }
+});
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+  let out = "BETWEEN THE NARROW PLACES \u2014 Journal Export\n\n";
+  sessions.forEach(s => {
+    const entry = loadEntry(s.id);
+    out += "== " + s.title + " ==\n";
+    out += "Prompt: " + s.prompt + "\n";
+    out += (entry.done ? "[complete]\n" : "[in progress]\n");
+    out += (entry.text ? entry.text : "(no entry yet)") + "\n\n";
+  });
+  const blob = new Blob([out], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "narrow-places-journal.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("This will clear all your saved reflections in this browser. Are you sure?")) return;
+  sessions.forEach(s => {
+    if (storageWorks) {
+      try { localStorage.removeItem("narrow-places:" + s.id); } catch (e) {}
+    }
+    delete memoryStore[s.id];
+  });
+  renderSessions();
+});
+
+document.querySelectorAll(".view-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const view = btn.dataset.view;
+    document.getElementById("overviewView").style.display = view === "overview" ? "block" : "none";
+    document.getElementById("sessionsView").style.display = view === "sessions" ? "block" : "none";
+  });
+});
+
+renderSessions();
+</script>
+</body>
+</html>
